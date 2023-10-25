@@ -72,7 +72,6 @@ class Runner():
         pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
         pretrained_dict={k:v for k,v in pretrained_dict.items() if 'conformer' in k}
         pretrained_dict.update({k:v for k,v in model_dict.items() if k not in pretrained_dict})
-        print(pretrained_dict.keys())
         self.model.load_state_dict(pretrained_dict)
         self.model.to(self.hp.device)
     def fuse_models(self,lm_path):

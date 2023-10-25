@@ -96,7 +96,6 @@ class LibriSpeech(Dataset):
         self.max_len=max(max_train_len,max_dev_clean_len,max_dev_other_len,max_test_clean_len,max_test_other_len)
         self.max_len=floor(self.max_len/self.hp.hop_length)+1
         self.max_len+=(3-self.max_len%3)
-        print('max len',self.max_len)
         if self.hp.max_target_len is None:
             self.max_target_len=max(max_target_train_len,max_target_dev_clean_len,max_target_dev_other_len,max_target_test_clean_len,max_target_test_other_len)
         else:
@@ -131,7 +130,7 @@ class LibriSpeech(Dataset):
             
             Inputs:
                 data: list; the dataset (ex. train dataset) to be filtered
-                n: int; the maximum transcript lenght
+                n: int; the maximum transcript length
             Outputs:
                 idx: list; list of the indices of the audios that have transcripts that are not too long
         '''
