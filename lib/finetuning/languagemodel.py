@@ -21,7 +21,6 @@ class LM(nn.Module):
         self.hp=hp
         self.input_embeddings=nn.Embedding(input_vocab_size,hp.input_embedding_size)
         self.input_rel_pos_emb=RelativePositionalEmbeddings((hp.batch_size*hp.lm_max_len,input_vocab_size,hp.input_embedding_size),hp.rel_pos_emb)()
-        # self.input_rel_pos_emb=RelativePositionalEmbeddings((hp.batch_size*hp.lm_max_len,output_vocab_size,hp.output_embedding_size),hp.rel_pos_emb)()
         self.output_embeddings=nn.Embedding(output_vocab_size,hp.output_embedding_size)
         self.output_rel_pos_emb=RelativePositionalEmbeddings((hp.batch_size*hp.lm_max_len,output_vocab_size,hp.output_embedding_size),hp.rel_pos_emb)()
         self.input_mhas=nn.ModuleList([nn.MultiheadAttention(hp.input_embedding_size,hp.lm_in_mhsa_num_heads,batch_first=True)]*hp.lm_in_N)
@@ -36,12 +35,9 @@ class LM(nn.Module):
         self.output_fcs=nn.ModuleList([nn.Linear(hp.lm_innner_output_nodes,hp.output_embedding_size)]*hp.lm_out_N)
         self.input_fcs_layernorm=nn.ModuleList([nn.LayerNorm(hp.input_embedding_size)]*hp.lm_in_N)
         self.output_fcs_layernorm=nn.ModuleList([nn.LayerNorm(hp.output_embedding_size)]*hp.lm_out_N)
-        # self.linear=nn.Linear(hp.output_embedding_size*output_vocab_size*hp.lm_max_len,output_vocab_size)
         self.linear=nn.Linear(hp.output_embedding_size*output_vocab_size,output_vocab_size)
-        # print(hp.output_embedding_size*output_vocab_size*hp.batch_size*hp.lm_max_len)
-        # print(hp.output_embedding_size,output_vocab_size,hp.batch_size*hp.lm_max_len)
         self.relu=nn.ReLU()
-        self.mask=self.get_mask(output_vocab_size)#,hp.output_embedding_size)
+        self.mask=self.get_mask(output_vocab_size)
     def get_mask(self,shape_0):
         '''
             Retrives the mask given a length
@@ -68,7 +64,6 @@ class LM(nn.Module):
                 x: tensor; output tensor, the input tensor after the application of the module layers
         '''
         for i in range(self.hp.lm_in_N):
-            # print(x.shape)
             x=x+self.input_mhas[i](x,x,x)[0]
             x=self.input_mhas_layernorm[i](x)
             ffn=self.inner_input_fcs[i](x)
@@ -86,8 +81,6 @@ class LM(nn.Module):
                 x: tensor; output tensor, the input tensor after the application of the module layers
         '''
         for i in range(self.hp.lm_out_N):
-            ## add mask
-            # print(x.shape)
             x=x+self.masked_output_mhas[i](x,x,x,attn_mask=self.mask)[0]
             x=self.masked_output_mhas_layernorm[i](x)
             x=x+self.output_mhas[i](x,enc,enc)[0]
@@ -106,25 +99,13 @@ class LM(nn.Module):
             Outputs:
                 x: tensor; output tensor, the input tensor after the application of the module layers
         '''
-        # self.input_embeddings.weight*=sqrt(self.hp.input_embedding_size)
-        # print(inbatch.shape)
         inbatch=self.input_embeddings(inbatch)
-        # print(inbatch.shape)
         inbatch=inbatch-self.input_rel_pos_emb
-        # inbatch=torch.flatten(inbatch,0,1)
-        # inbatch=inbatch.unsqueeze(1)
         enc=self.encoder(inbatch)
-        # self.output_embeddings.weight*=sqrt(self.hp.output_embedding_size)
         outbatch=self.output_embeddings(outbatch)
         outbatch=outbatch+self.output_rel_pos_emb
         inbatch=outbatch.unsqueeze(1)
-        # print(outbatch.shape)
-        # outbatch=torch.flatten(outbatch,0,1)
         x=self.decoder(outbatch,enc)
-        # print(x.shape)
-        # x=torch.flatten(x)
-        # print(x.shape)
-        # x=x.view(self.hp.batch_size,1,x.shape[0]//self.hp.batch_size)
         x=x.flatten(1).unsqueeze(1)
         x=self.linear(x)
         return x.squeeze()

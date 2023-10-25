@@ -40,23 +40,13 @@ class Evals():
             plt.plot(epochs,metric,'b-')
             if len(val_metric)>0:
                 plt.plot(epochs,val_metric,'r-')
-            # if len(val_other)>0:
-            #     plt.plot(epochs,val_other,'g-')
             plt.xlabel('epochs')
             plt.ylabel(ylabel)
             plt.title(title)
-            # plt.ylim(bottom=0)
-            # plt.box()
-            # plt.grid(False)
             filename=self.training_type+'_'+title.lower().replace(' ','_').replace('/','_')+'.pdf'
-            # if len(val_other)>0:
-            #     plt.legend(['train','dev-clean','dev_other'])
             if len(val_metric)>0:
                 plt.legend(['train','validation'])
-            # else:
-                # filename='test_metric.pdf'
             plt.savefig(os.path.join(self.plots_dir,filename))
-            # plt.close()
     def heatmap(self,model_name,y_true,y_pred,finetuning=False,norm=None):
         """  
             Computes the confusion matrix and visualizes it as a heatmap.
@@ -82,20 +72,14 @@ class Evals():
         cbar = ax.figure.colorbar(im, ax=ax,cmap=cmap,fraction=0.0475,pad=0.005)
         cbar.ax.set_ylabel('', rotation=-90, va="bottom")
         labels=np.unique(list(y_true)+list(y_pred))
-        # print(labels)
         ax.set_xticks(np.arange(len(labels)))
         ax.set_yticks(np.arange(len(labels)))
-        # rotation=45 if len(labels)>2 else 0
         ax.set_xticklabels(labels,rotation=90)
         ax.set_yticklabels(labels)
-        # for i in range(cm.shape[0]):
-        #     for j in range(cm.shape[1]):
-        #         text=ax.text(j, i, round(cm[i, j],2), ha="center", va="center", color="black")
         ax.set_title('Heatmap')
         plt.tight_layout()
         normalized='nomalized' if norm is not None else 'cases'
         plt.savefig(os.path.join(self.plots_dir,('finetuning' if finetuning else '')+model_name+'_'+normalized+'_heatmap.png'))
-        # plt.close()
 
         
    

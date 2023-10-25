@@ -25,15 +25,11 @@ class ConvSubSampling(nn.Module):
         conv_strides=[hp.conv_sub_1_stride,hp.conv_sub_2_stride]
         convh=hp.input_rows
         convw=hp.input_cols
-        #print(convh,convw)
         for i in range(len(conv_kers)):
             convi_stride_h,convi_stride_w=list(conv_strides[i])
             convh=(convh-conv_kers[i]+convi_stride_h)//(convi_stride_h)
             convw=(convw-conv_kers[i]+convi_stride_w)//(convi_stride_w)
-            #print(convh,convw)
         self.out_size=out_nodes*convh*convw
-        # print(out_nodes,convh,convw,out_nodes*convh*convw)
-        #print(out_nodes,convh,convw)
         
     def forward(self,x):
         '''
@@ -44,15 +40,8 @@ class ConvSubSampling(nn.Module):
             Outputs:
                 x: tensor; the output tensor of the model. The result of applying the model on the given input batch.
         '''
-        #print()
-        # print(x.shape)
         x=self.conv_sub_1(x)
-        #print(x.shape)
         x=self.conv_sub_2(x)
-        #print(x.shape)
-        # x=torch.flatten(x,1).unsqueeze(1)
-        #print(x.shape)
-        #print()
         return x
         
         
