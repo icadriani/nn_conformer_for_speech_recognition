@@ -79,8 +79,6 @@ class LibriSpeech(Dataset):
         if type(data['train'])==list:
             max_train_len=0
             max_target_train_len=0
-            min_train_mels=float('inf')
-            max_train_mels=0
             for i in range(len(data['train'])):
                 curr_max_train_len,curr_max_target_train_len,data['train'][i]=self.get_max_lens(data,'train',i)
                 max_train_len=max(max_train_len,curr_max_train_len)
