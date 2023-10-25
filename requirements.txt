@@ -1,0 +1,12 @@
+librosa
+colorama
+pytorch_adapt
+jiwer
+pytorch-nlp
+transformers
+pydub
+torch
+torchaudio
+torchtext
+tqdm
+matplotlib
