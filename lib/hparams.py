@@ -28,8 +28,6 @@ class HParams():
         self.beta1=0.9
         self.beta=0.9
         self.ngram=2
-        self.n_augs={'train':100000,'validation':5000,'test':5000,'pretrain':50000}
-        self.n_augs={'train':0,'validation':0,'test':0,'pretrain':0}
         self.scale_parameter=False
         self.relative_step=False
         self.lr=2e-5
@@ -104,7 +102,7 @@ class HParams():
         self.rel_att=False
         self.pretrained_conformer=False
         self.rel_pos_emb=self.rel_att
-        self.ft_lr=1e-6
+        self.ft_lr=3e-6
         self.ft_epochs=3
         self.ft_train_epochs=1
         self.lm_in_N=4
@@ -124,7 +122,8 @@ class HParams():
         self.decoder_fc_nodes=self.projection_out_size
         self.max_target_len=None 
         self.max_len=None 
-        self.just_nst=False
+        self.extra_proj=False
+        self.just_nst=True
     def set_max_len(self,max_len):
         self.max_len=max_len
     def set_target_max_len(self,max_len):

@@ -11,6 +11,7 @@ import os
 from jiwer import wer
 import torch.nn as nn
 from math import isnan
+from functools import reduce
 
 class Runner():
     '''
@@ -151,6 +152,11 @@ class Runner():
                         predicted=train_set.vocab.decode(predicted)
                         predicted=[predicted[i] for i in range(min(len(target),len(predicted))) if target[i]!='']
                         target=[x for x in target if x!='']
+                        predicted=[x.strip().split() if len(x.strip())>0 else ['_'] for x in predicted]
+                        target=[[x] for x in target]
+                        target=[target[i]+['_']*(len(predicted[i])-len(target[i])) for i in range(len(predicted))]
+                        predicted=reduce(lambda x,y: x+y,predicted)
+                        target=reduce(lambda x,y: x+y,target)
                         metric=wer(target,predicted)*100
                     else:
                         metric=torch.exp(loss).item()
@@ -216,6 +222,11 @@ class Runner():
                         predicted=test_set.vocab.decode(predicted)
                         predicted=[predicted[i] for i in range(min(len(target),len(predicted))) if target[i]!='']
                         target=[x for x in target if x!='']
+                        predicted=[x.strip().split() if len(x.strip())>0 else ['_'] for x in predicted]
+                        target=[[x] for x in target]
+                        target=[target[i]+['_']*(len(predicted[i])-len(target[i])) for i in range(len(predicted))]
+                        predicted=reduce(lambda x,y: x+y,predicted)
+                        target=reduce(lambda x,y: x+y,target)
                         metric=wer(target,predicted)*100
                         if heatmap:
                             y_true+=target

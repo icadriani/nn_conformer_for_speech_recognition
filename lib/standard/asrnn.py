@@ -37,6 +37,7 @@ class ASRNN(nn.Module):
         decoder_dropout=hp.dropout if hp.standard_decoder_layers>1 else 0.0
         self.lstm=nn.LSTM(hp.projection_out_size,hp.standard_decoder_nodes,bidirectional=hp.standard_decoder_bidirectional,num_layers=hp.standard_decoder_layers,dropout=decoder_dropout)
         self.dropout=nn.Dropout(hp.dropout)
+        # self.dropout1=nn.Dropout(0.2)
         decoder_out_size=hp.standard_decoder_nodes*2 if hp.standard_decoder_bidirectional else hp.standard_decoder_nodes
         self.final_fc=nn.Linear(decoder_out_size,hp.ntokens)
         self.beta=torch.rand(1).to(hp.device)
@@ -213,9 +214,9 @@ class ASRNN(nn.Module):
         x,output_lens=self.conformers(x,input_lens)
         x=nn.functional.pad(x,(0,0,0,self.hp.max_len-x.shape[1],0,self.hp.batch_size-input_lens.shape[0]))
         x=x.flatten(0,1)
-        x=self.dropout(x)
         x=self.projection_block(x)
-        if finetuning:
+        if finetuning and self.hp.extra_proj:
+            x=self.dropout(x)
             x=self.projection_block(x,True)
         return x,output_lens
          
